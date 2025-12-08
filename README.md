@@ -83,19 +83,19 @@ lsa-annelism-win.turbo.storage.umich.edu/lsa-annelism/RUSH_Study/RUSH_Psychopy
 ├── photo_allocator.py
 ├── stimuli/
 │   ├── support/
-│   │   ├── 01_{participant_id}_001/
+│   │   ├── 001_{participant_id}_001/
 │   │   │   ├── support_01.jpg
 │   │   │   ├── support_02.jpg
 │   │   │   ├── support_03.jpg
 │   │   │   ├── support_04.jpg
 │   │   │   └── support_05.jpg
-│   │   ├── 02_{participant_id}_002/
+│   │   ├── 002_{participant_id}_002/
 │   │   │   ├── support_01.jpg
 │   │   │   ├── support_02.jpg
 │   │   │   ├── support_03.jpg
 │   │   │   ├── support_04.jpg
 │   │   │   └── support_05.jpg
-│   │   └── 03_{participant_id}_001/
+│   │   └── 003_{participant_id}_001/
 │   │       └── ... (5 files, same as above)
 │   ├── strangers/
 │   │   ├── real/
@@ -152,9 +152,9 @@ lsa-annelism-win.turbo.storage.umich.edu/lsa-annelism/RUSH_Study/RUSH_Psychopy
 
 **Examples:**
 ```
-stimuli/support/01_124261_001/support_01.jpg
-stimuli/support/02_124262_001/support_02.jpg
-stimuli/support/03_123349_001/support_01.jpg
+stimuli/support/001_124261_001/support_01.jpg
+stimuli/support/002_124262_001/support_02.jpg
+stimuli/support/003_123349_001/support_01.jpg
 ```
 
 #### Real Stranger Photos
@@ -356,7 +356,7 @@ Determined by **last digit** of participant ID:
 **Examples:**
 - ID `001` → Last digit 1 (odd) → Approach-support first
 - ID `002` → Last digit 2 (even) → Avoid-support first
-- ID `01_12345_001` → Last digit 1 (odd) → Approach-support first
+- ID `001_12345_001` → Last digit 1 (odd) → Approach-support first
 
 **Consistency:** Same ID always produces same block order (even across visits)
 
