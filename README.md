@@ -47,7 +47,7 @@ The behavioral task consists of two tasks:
 - **Operating System:** Windows
 - **PsychoPy:** Has been only tested with (v20251.1)
 - **Display:** Minimum 1920×1080 resolution (fullscreen). Make sure that you go to Settings > Personalization > Taskbar > Taskbar behaviors > check 'Automatically hide the taskbar'.
-- **Input:** Standard keyboard with arrow keys (up/down) for implicit task, number keys 1-9 for explicit task, esc key to exit out of task window, space key to proceed through instructions
+- **Input:** Standard keyboard with arrow keys (up/down) for implicit task, letter keys A-L for explicit task, esc key to exit out of task window, space key to proceed through instructions
 
 ### Photo Requirements Summary
 - **Support Figures**: 5 per participant, can be JPG/PNG, 800×800 px
