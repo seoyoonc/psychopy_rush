@@ -30,7 +30,7 @@ The behavioral task consists of two tasks:
 ### Explicit Rating Task
 - **Trials:** 30 per visit
 - Participants rate faces on -4 (avoid) to +4 (approach) scale
-- Uses keyboard keys 1-9 (labeled as -4 to +4)
+- Uses keyboard keys A-L (labeled as -4 to +4)
 - Outcomes are rating and reaction time, and this data is exported automatically once the block is finished.
 
 ### Study Design
