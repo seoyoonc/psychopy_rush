@@ -1,9 +1,16 @@
-# project title: approach-avoid task
+# project title: rush behavioral task
 # author: seoyoonc
-# last updated 12/18/25
+# last updated 12/31/25
 
-# current revisions: got rid of none of the above option, added manipulation task,
-# keys for human, computer-generated, unsure correspond to 1, 2, 3 taped keys (H,J,K)
+# current revisions and points to look out for: practice photos excluded from explicit round, practice
+#                                               photos excluded from manipulation check, confidence display
+#                                               confidence display doesn't show selected numbers, clear events
+#                                               so that first question doesn't get skipped.
+# mention imagine you are the manikin.
+# to check: participant_001 vs 002
+# don't save block txt file
+# put the manikin at the bottom of the screen, where it is usually positioned,
+# and also put the instructions on the screen
 
 from psychopy import visual, core, event, gui
 from psychopy.hardware import keyboard
@@ -15,6 +22,7 @@ from datetime import datetime
 import sys
 
 # PARTICIPANT INFO
+
 exp_info = {
     'Participant ID': '',
     'Visit Number': ['2', '3']
@@ -37,7 +45,6 @@ data_dir = os.path.join(base_dir, 'data')
 os.makedirs(data_dir, exist_ok=True)
 
 # RACE/ETHNICITY SELECTION
-
 def get_race_ethnicity_selection():
     """Display race/ethnicity selection screen."""
     selection_win = visual.Window(
@@ -130,8 +137,7 @@ race_folder = race_ethnicity.lower()
 print(f"\nSelected race/ethnicity: {race_ethnicity}")
 
 # PHOTO ALLOCATION
-
-# initialize photo allocator
+# init photo allocator
 allocator = PhotoAllocator(base_dir)
 
 # support figures directory pulled from id directly
@@ -157,10 +163,9 @@ if last_digit % 2 == 1:  # odd
 else:  # even
     block_order = ['avoid_support', 'approach_support']
 
-print(f"\nBlock order (ID ends in {last_digit}): {block_order}")
+print(f"\n✓ Block order (ID ends in {last_digit}): {block_order}")
 
 # LOAD PHOTOS
-
 print("\n" + "="*60)
 print("LOADING PHOTOS")
 print("="*60)
@@ -206,6 +211,7 @@ print(f"Block 2: {len(implicit_block2_allocation['real'])} real + {len(implicit_
 # get practice strangers (4 AI - 1 of EACH race including participant's own)
 # practice photos CAN be reused across visits to save photos for randomization
 practice_strangers = []
+practice_stranger_filenames = []  # Track filenames to exclude from explicit task
 all_races = ['white', 'asian', 'black', 'hispanic']
 
 print(f"\nSelecting practice strangers (need 4: 1 of each race including {race_folder})...")
@@ -218,6 +224,7 @@ for race in all_races:
         selected = random.choice(race_ai)
         full_path = os.path.join(base_dir, 'stimuli', 'strangers', 'ai', selected)
         practice_strangers.append(full_path)
+        practice_stranger_filenames.append(selected)  # Track filename
         print(f"Practice stranger {len(practice_strangers)}: {race} - {selected}")
     else:
         print(f"WARNING: No AI photos available for {race}")
@@ -227,15 +234,31 @@ if len(practice_strangers) < 4:
 else:
     print(f"Practice: {len(practice_strangers)} strangers (1 of each race, can repeat across visits)")
 
-# allocate photos for explicit task
+# allocate photos for explicit task (EXCLUDING practice photos)
 print("\nAllocating photos for Explicit Task...")
 explicit_allocation = allocator.allocate_photos(
     participant_id, race_folder, int(visit_num), 'explicit', 'explicit'
 )
-explicit_strangers = allocator.get_photo_paths(
+
+# FILTER OUT practice photos from explicit task
+explicit_strangers_all = allocator.get_photo_paths(
     explicit_allocation['real'] + explicit_allocation['ai']
 )
-print(f"Explicit: {len(explicit_strangers)} strangers allocated")
+
+# Remove any photos that were used in practice
+explicit_strangers = []
+for photo in explicit_strangers_all:
+    filename = os.path.basename(photo)
+    if filename not in practice_stranger_filenames:
+        explicit_strangers.append(photo)
+    else:
+        print(f"Excluding practice photo from explicit: {filename}")
+
+# If we filtered out photos, we might have fewer than 25
+if len(explicit_strangers) < 25:
+    print(f"WARNING: Only {len(explicit_strangers)} strangers after excluding practice photos")
+else:
+    print(f"Explicit: {len(explicit_strangers)} strangers allocated (practice photos excluded)")
 
 print("="*60)
 
@@ -292,7 +315,7 @@ instruction_text = visual.TextStim(
     wrapWidth=1.5
 )
 
-# rating display text (for explicit task)
+# Rating display text (for explicit task)
 rating_instruction = visual.TextStim(
     win,
     text='',
@@ -311,8 +334,7 @@ rating_display = visual.TextStim(
     pos=(0, -0.35)
 )
 
-# IMPLICIT TASK INSTRUCTIONS
-
+# IMPLICIT TASK FUNCTIONS
 def show_implicit_instructions(block_type, is_practice=False):
     """Display instructions for implicit task."""
     
@@ -341,12 +363,12 @@ def show_implicit_instructions(block_type, is_practice=False):
             "Press SPACE to begin."
         )
     
-    # move instruction text up to avoid overlap
+    # move instruction text up to avoid overlap with manikin
     instruction_text.pos = (0, 0.15)
     instruction_text.text = instr
     instruction_text.draw()
     
-    # manikin position
+    # show manikin at bottom (same position as in trials)
     manikin.pos = (0, -0.3)
     manikin.draw()
     
@@ -417,13 +439,13 @@ def run_implicit_trial(trial_info, trial_num, is_practice=False):
     # det correct response based on block type and image type
     # manikin at bottom: UP = approach (bigger), DOWN = avoid (smaller)
     if block_type == 'approach_support':
-        # Should approach support, avoid strangers
+        # approach support, avoid strangers
         if image_type == 'support':
             correct_key = 'up'  # Approach = UP
         else:
             correct_key = 'down'  # Avoid = DOWN
     else:  # avoid_support
-        # should avoid support, approach strangers
+        # avoid support, approach strangers
         if image_type == 'support':
             correct_key = 'down'  # Avoid = DOWN
         else:
@@ -444,7 +466,7 @@ def run_implicit_trial(trial_info, trial_num, is_practice=False):
     
     win.flip()
     
-    # 3. wait
+    # 3. wait for response
     kb.clock.reset()
     keys = kb.waitKeys(keyList=['up', 'down', 'escape'], waitRelease=False)
     
@@ -456,15 +478,16 @@ def run_implicit_trial(trial_info, trial_num, is_practice=False):
     rt = keys[0].rt if keys else None
     accuracy = 1 if response == correct_key else 0
     
-    # 4. visual feedback - manikin moves and image size changes    
+    # 4. visual feedback - manikin moves and image size changes
+    # manikin always at bottom: UP = approach (bigger), DOWN = avoid (smaller)
     if response == 'up':
         # manikin up (toward center/approach)
-        manikin.pos = (0, -0.15)  # Closer to image
-        face_stim.size = (0.6, 0.6)  # Image BIGGER
+        manikin.pos = (0, -0.15)  # closer to image
+        face_stim.size = (0.6, 0.6)  # image BIGGER
     elif response == 'down':
         # manikin down (away from center/avoid)
-        manikin.pos = (0, -0.45)  # Further from image
-        face_stim.size = (0.25, 0.25)  # Image SMALLER
+        manikin.pos = (0, -0.45)  # further from image
+        face_stim.size = (0.25, 0.25)  # image SMALLER
     
     face_stim.draw()
     manikin.draw()
@@ -521,10 +544,11 @@ def run_implicit_block(trial_list, block_num, is_practice=False):
     
     return block_data
 
-# MANIPULATION CHECK (VISIT 3 ONLY)
+# MANIPULATION CHECK FUNCTIONS (Visit 3 only)
 
 def run_manipulation_check(all_real_photos, all_ai_photos):
     """
+    Manipulation check for Visit 3 only.
     Shows 2 real + 2 AI photos and asks participants to identify them.
     """
     
@@ -540,17 +564,27 @@ def run_manipulation_check(all_real_photos, all_ai_photos):
     
     # instructions
     instruction_text.text = (
-        "You will see a total of 4 face images.\n\n"
+        "Final Task:\n\n"
+        "You will see 4 face images.\n\n"
         "For each image, you will answer two questions:\n"
+        "1. Do you think it was taken by a human photographer or generated by a computer?\n"
+        "2. How confident are you in your answer? (0-100)\n\n"
         "Press SPACE to begin."
     )
     instruction_text.draw()
     win.flip()
     event.waitKeys(keyList=['space', 'escape'])
     
+    # clear any remaining events before starting trials
+    event.clearEvents()
+    core.wait(0.5)  # brief pause after instructions
+    
     # show each photo
     for i, photo_path in enumerate(all_check_photos):
         trial_num = i + 1
+        
+        # clear events at start of each trial to prevent carryover
+        event.clearEvents()
         
         # det actual source
         filename = os.path.basename(photo_path)
@@ -577,7 +611,7 @@ def run_manipulation_check(all_real_photos, all_ai_photos):
         
         options_text = visual.TextStim(
             win,
-            text='Press YELLOW key: 1 = Human photographer   2 = Computer-generated   3 = Unsure',
+            text='Press: 1 = Human photographer   2 = Computer-generated   3 = Unsure',
             pos=(0, -0.30),
             height=0.035,
             color='yellow',
@@ -603,10 +637,14 @@ def run_manipulation_check(all_real_photos, all_ai_photos):
                 else:
                     response = response_map[keys[0]]
         
-        # Q2: confidence rating (0-100)
+        # clear any remaining key presses before confidence question
+        event.clearEvents()
+        core.wait(0.3)  # brief pause to prevent accidental key carryover
+        
+        # Q2: Confidence rating (0-100)
         confidence_text = visual.TextStim(
             win,
-            text='How confident are you in your answer?\n\nUsing the original number keys (not the yellow keys), type a number from 0 (not at all confident) to 100 (extremely confident)\n\nPress ENTER when done.',
+            text='How confident are you in your answer?\n\nType a number from 0 (not at all confident) to 100 (extremely confident)\n\nPress ENTER when done.',
             pos=(0, -0.15),
             height=0.04,
             color='white',
@@ -627,11 +665,11 @@ def run_manipulation_check(all_real_photos, all_ai_photos):
         while confidence is None:
             face_stim.draw()
             confidence_text.draw()
-            confidence_display.text = typed_number
+            confidence_display.text = typed_number  # show what's been typed
             confidence_display.draw()
             win.flip()
             
-            keys = event.getKeys()
+            keys = event.getKeys(keyList=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'return', 'backspace', 'escape'])
             if keys:
                 for key in keys:
                     if key == 'escape':
@@ -639,16 +677,17 @@ def run_manipulation_check(all_real_photos, all_ai_photos):
                         core.quit()
                     elif key == 'return':
                         # try to convert to number
-                        try:
-                            conf_num = int(typed_number)
-                            if 0 <= conf_num <= 100:
-                                confidence = conf_num
-                            else:
-                                # invalid range, reset
+                        if typed_number:  # only try if something was typed
+                            try:
+                                conf_num = int(typed_number)
+                                if 0 <= conf_num <= 100:
+                                    confidence = conf_num
+                                else:
+                                    # invalid range, reset
+                                    typed_number = ''
+                            except:
+                                # invalid input, reset
                                 typed_number = ''
-                        except:
-                            # invalid input, reset
-                            typed_number = ''
                     elif key == 'backspace':
                         typed_number = typed_number[:-1]
                     elif key in '0123456789' and len(typed_number) < 3:
@@ -665,13 +704,14 @@ def run_manipulation_check(all_real_photos, all_ai_photos):
         }
         manipulation_data.append(trial_data)
         
-        # brief ITI
+        # brief ITI and clear events to prevent carryover to next trial
         win.flip()
         core.wait(0.5)
+        event.clearEvents()  # clear any stray key presses
     
     return manipulation_data
 
-# EXPLICIT TASK
+# EXPLICIT TASK FUNCTIONS
 
 def show_explicit_instructions():
     """Display instructions for explicit task."""
@@ -716,7 +756,7 @@ def run_explicit_trial(image_path, trial_num):
         "-4 (Avoid)     0 (Neutral)     +4 (Approach)"
     )
     
-    # wait
+    # wait for valid key press
     start_time = core.getTime()
     rating = None
     key_pressed = None
@@ -792,30 +832,30 @@ def run_explicit_task(support_imgs, stranger_imgs):
     
     return explicit_data
 
-#SAVING DATA
+# SAVE DATA
 
 def save_data_to_csv(data_list, participant_id, visit_num, session_time, race_ethnicity, 
                      data_dir, task_type, block_label="", date_only=""):
     """Save data to CSV file."""
     if not data_list:
-        print(f"No data to save for {block_label}")
+        print(f"⚠️  No data to save for {block_label}")
         return None
     
     df = pd.DataFrame(data_list)
     
-    # session_time to all rows (keep timestamp for each trial)
+    # add session_time to all rows (keep timestamp for each trial)
     df['session_time'] = session_time
     
-    # race_ethnicity only in first row
+    # add race_ethnicity only in first row
     df['race_ethnicity'] = ''
     df.loc[0, 'race_ethnicity'] = race_ethnicity
     
-    # calculate averages for implicit task (which has is_practice column)
+    # only calculate averages for implicit task (which has is_practice column)
     if task_type == 'implicit':
-        # averages for main trials only (excluding practice)
+        # calc averages for main trials only (excluding practice)
         main_trials = df[df['is_practice'] == False]
         
-        # combined implicit CSV, add overall averages in first row only
+        # for combined implicit CSV, add overall averages in first row only
         if block_label == 'combined':
             if len(main_trials) > 0:
                 avg_accuracy = main_trials['accuracy'].mean()
@@ -856,12 +896,12 @@ def save_data_to_csv(data_list, participant_id, visit_num, session_time, race_et
     
     return output_path
 
-# MAIN
+# MAIN EXPERIMENT
 
 def run_experiment():
     """Run the complete experiment."""
     
-    # welcome screen
+    # Welcome screen
     instruction_text.text = (
         "Welcome!\n\n"
         "Press SPACE to begin."
@@ -870,7 +910,7 @@ def run_experiment():
     win.flip()
     event.waitKeys(keyList=['space', 'escape'])
     
-    # IMPLICIT
+    # IMPLICIT TASK
     
     print("\n" + "="*60)
     print("STARTING IMPLICIT TASK")
@@ -888,48 +928,48 @@ def run_experiment():
     win.flip()
     event.waitKeys(keyList=['space', 'escape'])
     
-    # block 1
+    # Block 1
     block_1_type = block_order[0]
     block_1_data = []
     
-    # practice
+    # Practice
     practice_trials_1 = create_practice_trials(support_images, practice_strangers, block_1_type)
     practice_data_1 = run_implicit_block(practice_trials_1, block_num=1, is_practice=True)
     block_1_data.extend(practice_data_1)
     
-    # main trials
+    # Main trials
     block_1_trials = create_implicit_trial_list(support_images, implicit_block1_strangers, block_1_type)
     block_1_main_data = run_implicit_block(block_1_trials, block_num=1, is_practice=False)
     block_1_data.extend(block_1_main_data)
     
-    # save block 1
+    # Save Block 1
     save_data_to_csv(block_1_data, participant_id, visit_num, session_time, 
                      race_ethnicity, data_dir, 'implicit', block_label='block1', date_only=date_only)
     
-    # block 2 (no break screen - go straight to next block)
+    # Block 2 (no break screen - go straight to next block)
     block_2_type = block_order[1]
     block_2_data = []
     
-    # practice
+    # Practice
     practice_trials_2 = create_practice_trials(support_images, practice_strangers, block_2_type)
     practice_data_2 = run_implicit_block(practice_trials_2, block_num=2, is_practice=True)
     block_2_data.extend(practice_data_2)
     
-    # main trials
+    # Main trials
     block_2_trials = create_implicit_trial_list(support_images, implicit_block2_strangers, block_2_type)
     block_2_main_data = run_implicit_block(block_2_trials, block_num=2, is_practice=False)
     block_2_data.extend(block_2_main_data)
     
-    # save Block 2
+    # Save Block 2
     save_data_to_csv(block_2_data, participant_id, visit_num, session_time,
                      race_ethnicity, data_dir, 'implicit', block_label='block2', date_only=date_only)
     
-    # save Combined
+    # Save Combined
     all_implicit_data = block_1_data + block_2_data
     save_data_to_csv(all_implicit_data, participant_id, visit_num, session_time,
                      race_ethnicity, data_dir, 'implicit', block_label='combined', date_only=date_only)
     
-    # EXPLICIT
+    # EXPLICIT TASK (no transition screen - seamless)
     
     print("\n" + "="*60)
     print("STARTING EXPLICIT TASK")
@@ -944,9 +984,9 @@ def run_experiment():
         save_data_to_csv(explicit_data, participant_id, visit_num, session_time,
                          race_ethnicity, data_dir, 'explicit', date_only=date_only)
     else:
-        print("WARNING: No explicit data to save!")
+        print("⚠️  WARNING: No explicit data to save!")
     
-    # MANIPULATION CHECK
+    # MANIPULATION CHECK (Visit 3 only)
     
     manipulation_data = []
     if visit_num == '3':
@@ -954,19 +994,22 @@ def run_experiment():
         print("STARTING MANIPULATION CHECK")
         print("="*60)
         
-        # collect all real and AI photos used in this session
+        # collect all real and AI photos used in this session (EXCLUDING practice)
         all_real_used = []
         all_ai_used = []
         
-        # from implicit blocks
+        # from implicit blocks (main trials only, not practice)
         for photo in implicit_block1_strangers + implicit_block2_strangers:
             filename = os.path.basename(photo)
+            # skip practice photos
+            if filename in practice_stranger_filenames:
+                continue
             if filename.startswith('real_'):
                 all_real_used.append(photo)
             elif filename.startswith('ai_'):
                 all_ai_used.append(photo)
         
-        # from explicit task
+        # from explicit task (already excludes practice photos)
         for photo in explicit_strangers:
             filename = os.path.basename(photo)
             if filename.startswith('real_'):
@@ -977,6 +1020,9 @@ def run_experiment():
         # remove duplicates
         all_real_used = list(set(all_real_used))
         all_ai_used = list(set(all_ai_used))
+        
+        print(f"  Available for manipulation check: {len(all_real_used)} real + {len(all_ai_used)} AI")
+        print(f"  (Practice photos excluded)")
         
         manipulation_data = run_manipulation_check(all_real_used, all_ai_used)
         
@@ -995,6 +1041,7 @@ def run_experiment():
             print(f"✓ Saved: {output_filename}")
     
     # END
+    
     instruction_text.text = (
         "You have completed all tasks!\n\n"
         "Thank you for your participation.\n\n"
@@ -1006,7 +1053,7 @@ def run_experiment():
     
     return all_implicit_data, explicit_data, manipulation_data
 
-# RUN
+# RUN EXPERIMENT
 
 try:
     implicit_data, explicit_data, manipulation_data = run_experiment()
@@ -1023,7 +1070,7 @@ try:
         print(f"Manipulation check trials: {len(manipulation_data)}")
     print(f"\nData saved to: {data_dir}")
     
-    # allocation summary
+    # Show allocation summary
     print("\n" + allocator.get_allocation_summary(participant_id))
     
 finally:
