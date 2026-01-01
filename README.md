@@ -83,19 +83,19 @@ lsa-annelism-win.turbo.storage.umich.edu/lsa-annelism/RUSH_Study/RUSH_Psychopy
 ├── photo_allocator.py
 ├── stimuli/
 │   ├── support/
-│   │   ├── 001_{participant_id}_001/
+│   │   ├── 001_{participant_id}_01/
 │   │   │   ├── support_01.jpg
 │   │   │   ├── support_02.jpg
 │   │   │   ├── support_03.jpg
 │   │   │   ├── support_04.jpg
 │   │   │   └── support_05.jpg
-│   │   ├── 002_{participant_id}_002/
+│   │   ├── 002_{participant_id}_02/
 │   │   │   ├── support_01.jpg
 │   │   │   ├── support_02.jpg
 │   │   │   ├── support_03.jpg
 │   │   │   ├── support_04.jpg
 │   │   │   └── support_05.jpg
-│   │   └── 003_{participant_id}_001/
+│   │   └── 003_{participant_id}_01/
 │   │       └── ... (5 files, same as above)
 │   ├── strangers/
 │   │   ├── real/
@@ -109,13 +109,13 @@ lsa-annelism-win.turbo.storage.umich.edu/lsa-annelism/RUSH_Study/RUSH_Psychopy
 │   │   │   ├── real_hispanic_01.jpg
 │   │   │   └── ... (6 hispanic photos)
 │   │   └── ai/
-│   │       ├── ai_white_001.jpg
+│   │       ├── ai_white_01.jpg
 │   │       ├── ... (55 white photos)
-│   │       ├── ai_asian_001.jpg
+│   │       ├── ai_asian_01.jpg
 │   │       ├── ... (55 asian photos)
-│   │       ├── ai_black_001.jpg
+│   │       ├── ai_black_01.jpg
 │   │       ├── ... (55 black photos)
-│   │       ├── ai_hispanic_001.jpg
+│   │       ├── ai_hispanic_01.jpg
 │   │       └── ... (55 hispanic photos)
 │   └── stickmanikin.png
 └── data/
@@ -152,9 +152,9 @@ lsa-annelism-win.turbo.storage.umich.edu/lsa-annelism/RUSH_Study/RUSH_Psychopy
 
 **Examples:**
 ```
-stimuli/support/001_124261_001/support_01.jpg
-stimuli/support/002_124262_001/support_02.jpg
-stimuli/support/003_123349_001/support_01.jpg
+stimuli/support/001_124261_01/support_01.jpg
+stimuli/support/002_124262_01/support_02.jpg
+stimuli/support/003_123349_01/support_01.jpg
 ```
 
 #### Real Stranger Photos
@@ -187,10 +187,10 @@ real_hispanic_01.jpg through real_hispanic_06.jpg (6 photos)
 
 **Required Files (220 total):**
 ```
-ai_white_001.jpg through ai_white_055.jpg (55 photos)
-ai_asian_001.jpg through ai_asian_055.jpg (55 photos)
-ai_black_001.jpg through ai_black_055.jpg (55 photos)
-ai_hispanic_001.jpg through ai_hispanic_055.jpg (55 photos)
+ai_white_01.jpg through ai_white_55.jpg (55 photos)
+ai_asian_01.jpg through ai_asian_55.jpg (55 photos)
+ai_black_01.jpg through ai_black_55.jpg (55 photos)
+ai_hispanic_01.jpg through ai_hispanic_55.jpg (55 photos)
 ```
 
 **Note:** all files must follow the naming pattern exactly.
