@@ -226,7 +226,8 @@ ai_hispanic_001.jpg through ai_hispanic_055.jpg (55 photos)
 For each new participant:
 ```bash
 # Create folder with their ID
-mkdir stimuli/support/{participant_id}
+cd /RUSH_Study/RUSH_Psychopy/
+mkdir -p stimuli/support/{participant_id}
 
 # Add 5 photos named support_01.jpg through support_05.jpg
 ```
