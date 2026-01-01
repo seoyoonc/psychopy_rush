@@ -1,6 +1,6 @@
 # RUSH PsychoPy Protocol
 ##### Author: Seoyoon
-##### Last updated: 12/5/25
+##### Last updated: 01/01/26
 
 ---
 ## Table of Contents
