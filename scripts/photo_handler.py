@@ -9,10 +9,31 @@ import os
 import random
 from typing import Dict, List, Set, Tuple
 
+from participant import *
+from exception import *
+
+def load_images_from_folder(folder_path):
+    valid_extensions = ['.jpg', '.jpeg', '.png', '.bmp']
+    images = []
+    
+    if os.path.exists(folder_path):
+        for filename in sorted(os.listdir(folder_path)):
+            if any(filename.lower().endswith(ext) for ext in valid_extensions):
+                images.append(os.path.join(folder_path, filename))
+    
+    else:
+        raise FileNotFoundError(f"Folder not found: {folder_path}")
+        return images
+    
+    if len(images) != 5: raise NotFiveSupportImagesError(len(images))
+
+    return images
+
+
 class PhotoAllocator:
     def __init__(self, base_dir: str):
         self.base_dir = base_dir
-        self.allocation_file = os.path.join(base_dir, 'data', 'photo_allocations.json')
+        self.allocation_file = os.path.join(base_dir, 'photo_allocations.json')
         
         # load or init allocations
         self.allocations = self._load_allocations()
@@ -93,7 +114,7 @@ class PhotoAllocator:
         
         return used
     
-    def allocate_photos(self, participant_id: str, race: str, visit: int, 
+    def allocate_photos(self, participant: Participant, 
                        block: str, task: str) -> Dict[str, List[str]]:
         """
         purpose: to allocate photos for a specific block/task.
@@ -108,22 +129,21 @@ class PhotoAllocator:
         returns:
             dict with 'real' and 'ai' lists of filenames
         """
-        race = race.lower()
         
         # init participant if new
-        if participant_id not in self.allocations['participants']:
-            self.allocations['participants'][participant_id] = {
-                'race': race,
+        if participant.id not in self.allocations['participants']:
+            self.allocations['participants'][participant.id] = {
+                'race': participant.race,
                 'visits': {}
             }
         
-        participant_data = self.allocations['participants'][participant_id]
+        participant_data = self.allocations['participants'][participant.id]
         
         # init visit if new
-        if str(visit) not in participant_data['visits']:
-            participant_data['visits'][str(visit)] = {}
+        if str(participant.visit_num) not in participant_data['visits']:
+            participant_data['visits'][str(participant.visit_num)] = {}
         
-        visit_data = participant_data['visits'][str(visit)]
+        visit_data = participant_data['visits'][str(participant.visit_num)]
         
         # check if already allocated
         block_key = f"{task}_{block}" if task == 'implicit' else task
@@ -132,10 +152,10 @@ class PhotoAllocator:
             return visit_data[block_key]
         
         # get photos already used by this participant
-        participant_used = self._get_participant_used_photos(participant_id)
+        participant_used = self._get_participant_used_photos(participant.id)
         
         # allocate new photos
-        allocation = self._allocate_new_photos(race, participant_used, task)
+        allocation = self._allocate_new_photos(participant.race, participant_used, task)
         
         # save allocation
         visit_data[block_key] = allocation
@@ -244,3 +264,5 @@ class PhotoAllocator:
                 summary.append(f"  {block}: {real_count} real + {ai_count} AI = {real_count + ai_count} total")
         
         return "\n".join(summary)
+
+
