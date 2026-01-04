@@ -293,6 +293,7 @@ def run_manipulation_check(gui : VisualWindow, all_real_photos, all_ai_photos):
         # keys H, J, K are labeled as 1, 2, 3 on the physical keyboard
         response = None
         response_map = {'h': 'Human photographer', 'j': 'Computer-generated', 'k': 'Unsure'}
+        trial_clock = core.Clock()
         
         while response is None:
             gui.face_stim.draw()
@@ -307,6 +308,7 @@ def run_manipulation_check(gui : VisualWindow, all_real_photos, all_ai_photos):
                     core.quit()
                 else:
                     response = response_map[keys[0]]
+                    rt = trial_clock.getTime()
         
         # clear any remaining key presses before confidence question
         event.clearEvents()
@@ -371,7 +373,8 @@ def run_manipulation_check(gui : VisualWindow, all_real_photos, all_ai_photos):
             'image_filename': filename,
             'actual_source': actual_source,
             'participant_response': response,
-            'confidence': confidence
+            'confidence': confidence,
+            'reaction_time': rt
         }
         manipulation_data.append(trial_data)
         

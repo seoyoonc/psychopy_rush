@@ -31,9 +31,13 @@ def load_images_from_folder(folder_path):
 
 
 class PhotoAllocator:
-    def __init__(self, base_dir: str):
+    def __init__(self, base_dir: str, json_save_dir: str = None):
         self.base_dir = base_dir
-        self.allocation_file = os.path.join(base_dir, 'photo_allocations.json')
+        
+        if json_save_dir is None:
+            json_save_dir = base_dir
+        
+        self.allocation_file = os.path.join(json_save_dir, 'data', 'photo_allocations.json')
         
         # load or init allocations
         self.allocations = self._load_allocations()

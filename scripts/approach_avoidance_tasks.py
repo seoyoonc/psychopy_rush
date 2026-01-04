@@ -121,9 +121,9 @@ def main():
     race_ethnicity = get_race_ethnicity_selection(gui)
     participant.race = race_ethnicity
 
-
     ##### Photo Allocation for Tasks #####
-    allocator = PhotoAllocator(data_dir)
+    # allocator = PhotoAllocator(data_dir)
+    allocator = PhotoAllocator(base_dir, participant.support_dir)
 
     (support_images, 
     practice_strangers, 
