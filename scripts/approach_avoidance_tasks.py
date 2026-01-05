@@ -141,7 +141,6 @@ def main():
 
     event.waitKeys(keyList=['space', 'escape'])
 
-
     # Block 1
     block_1_type = participant.block_order[0]
     block_1_data = []
@@ -185,8 +184,6 @@ def main():
     
     ##### Explicit Task #####    
     explicit_data = run_explicit_task(gui, support_images, explicit_strangers)
-    
-
     
     # save explicit data
     if explicit_data:
@@ -252,7 +249,6 @@ def main():
     
     gui.close()
     return all_implicit_data, explicit_data, manipulation_data, allocator, participant
-
 
 if __name__ == "__main__":
     try:

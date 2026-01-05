@@ -21,10 +21,10 @@ class Participant:
     def split_id_string(self, id_string):
         separated_string = id_string.split('_')
         self.participant_num = int(separated_string[0])
-        self.id = int(separated_string[1])
+        self.id = int(separated_string[-1])
 
     def set_block_order(self):
-        if self.participant_num % 2 == 1:  
+        if self.id % 2 == 1:  
             self.block_order = ['approach_support', 'avoid_support']
 
         else: 
