@@ -16,7 +16,7 @@ from exception import *
 def main_allocation_task(allocator, manikin, participant):
     # load support figures
     try:
-        support_images = load_images_from_folder(participant.support_dir)
+        support_images = load_images_from_folder(participant.support_dir)[:5]
     except NotFiveSupportImagesError as e:
         print(e)
         print("looked in folder:", participant.support_dir)
